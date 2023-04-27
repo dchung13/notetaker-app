@@ -57,9 +57,26 @@ app.post('/api/notes', (req, res) => {
     }
 });
 
-app.delete('/api/notes', (req, res) => {
-    res.json('DELETE route');
-})
+app.delete('/api/notes/:id', (req, res) => {
+   
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            let parsedData = JSON.parse(data);
+            let id = req.params.id;
+
+            for (let i=0; i< parsedData.length; i++) {
+                if (parsedData[i].id === id) {
+                parsedData.splice(i, 1);
+            }} res.send('Note deleted successfully!')
+
+            fs.writeFile('./db/db.json', JSON.stringify(parsedData, null, 2), (err) => {
+                err ? console.error(err) : console.info('\nData written to /db/db.json');
+            })
+        }
+    }) 
+});
 
 app.listen(PORT, () => {
     console.log(`App listening at http://localhost:${PORT}`)
